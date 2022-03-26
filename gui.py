@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from ttkbootstrap import Style
+from ttkbootstrap import Style, Meter
 from PIL import Image, ImageTk
 from database import QuizDB
 
@@ -8,16 +8,16 @@ from database import QuizDB
 TODO:
 >>> Select a better day theme
 >>> Write doc of each method
->>> At starting, a button will display which ask start quiz, quit option. (CS quiz)
+>>> At starting, a button will display which ask start quiz, quit option. (CS quiz)                                                 DONE
 
->>> After submitting, the button will forget and correct/incorrect with respective images will show
->>> Each mcq is of 10 point
+>>> After submitting, the button will forget and correct/incorrect with respective images will show                                 DONE
+>>> Each mcq is of 10 point                                                                                                         DONE
 >>> On top left, Current score label with ...->
->>> progress bar on top shows no of points out of total
->>> Meter on right of question shows time taken after 500 seconds and time left as it's label
->>> New question came after 3 seconds (within 3 seconds correct/incorrect will display)
+>>> Meter on right of question shows time taken after 500 seconds and time left as it's label                                       DONE
+>>> If time up, and not answered, it will marked as unattempted, and show unattempt
+>>> New question came after 3 seconds (within 3 seconds correct/incorrect will display)                                             DONE
 
->>> When End, table will be shown, showing total score out of TOTAL points, total correct, total incorrect out of TOTAL mcqs
+>>> When End, table will be shown, showing total score out of TOTAL points, total correct, total incorrect, unattempted out of TOTAL mcqs
 >>> Also, asking for play again or quit option.
 """
 
@@ -31,15 +31,6 @@ class QuizApp(tk.Tk):
         self.geometry("1200x700+350+150")
         self.resizable(False, False)
         self.style = Style(theme="darkly")
-        self.style.configure("Toolbutton", font=("Tahoma", 16))
-        self.style.configure("TButton", font=("Tahoma", 18))
-
-    def change_theme(self):
-        self.style.theme_use(themename="flatly" if self.DARK else "darkly")
-        self._img = ImageTk.PhotoImage(Image.open(
-            "./moon.png" if self.DARK else "./sun.png").resize((30, 30)))
-        self.theme_mode.configure(image=self._img)
-        self.DARK = not self.DARK
         self.style.configure("Toolbutton", font=("Tahoma", 16))
         self.style.configure("TButton", font=("Tahoma", 18))
 
@@ -59,9 +50,28 @@ class QuizApp(tk.Tk):
                                   style="warning.Horizontal.TSeparator")
         self.sep1.pack(side="top", fill="x")
 
-    def quiz(self):
+    def ask_to_start(self):
+        frame_1 = ttk.Frame(self, style="TFrame")
+        start_lbl = ttk.Label(frame_1, text="Start Quiz ?\nTopic: Networking (CS)",
+                              font=("Tahoma", 24), style="info.TLabel",
+                              justify="center", padding=(60, 5))
+        start_lbl.place(x=380, y=150)
+        start_btn = ttk.Button(frame_1, text="Start", style="success.TButton", padding=(40, 5),
+                               command=lambda: frame_1.destroy() or self.start_quiz())
+        start_btn.place(x=450, y=300)
+        start_btn.focus_force()
+        quit_btn = ttk.Button(frame_1, text="Quit", style="danger.TButton",
+                              padding=(40, 5), command=self.destroy)
+        quit_btn.place(x=650, y=300)
+        frame_1.pack(side="top", fill="both", expand=1)
+        ...
+
+    def start_quiz(self):
         self.quiz_area = ttk.Frame(self, style="TFrame")
         self.mcq = self.get_mcqs()
+        self.max_score = 60
+        self.current_score = 0
+        self.time_spent = 0
         no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
         # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
         # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
@@ -70,6 +80,13 @@ class QuizApp(tk.Tk):
         # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
 
         print(no, question, op_a, op_b, op_c, op_d, self.correct)
+        self.current_score_lbl = ttk.Label(self.quiz_area, text="Score:  0",
+                                           font=("Arial", 18), style="primary.TLabel")
+        self.current_score_lbl.place(x=50, y=20)
+        self.timer = Meter(self.quiz_area, amounttotal=10, amountused=0,
+                           metersize=150, textfont=("Arial", 40, "bold"), bootstyle="info.TMeter")
+        self.timer.place(x=1000, y=20)
+        self.after(1000, self.update_time)
         self.question = ttk.Label(self.quiz_area, text=f"Q{no}. {question}",
                                   font=("Arial", 22, "bold"), style="info.TLabel",
                                   wraplength=680, anchor="n", padding=(0, 8), width=45)
@@ -85,7 +102,7 @@ class QuizApp(tk.Tk):
 
         self.op_b = ttk.Radiobutton(self.options, text=f"b. {op_b}",
                                     style="warning.Outline.Toolbutton", width=width,
-                                    value="b", variable=self.selected_option)
+                                    value="b", variable=self.selected_option, )
         self.op_b.grid(row=0, column=1, padx=200-(width*2), pady=30)
 
         self.op_c = ttk.Radiobutton(self.options, text=f"c. {op_c}",
@@ -112,15 +129,48 @@ class QuizApp(tk.Tk):
 
         ...
 
+    def change_theme(self):
+        self.style.theme_use(themename="flatly" if self.DARK else "darkly")
+        self._img = ImageTk.PhotoImage(Image.open(
+            "./moon.png" if self.DARK else "./sun.png").resize((30, 30)))
+        self.theme_mode.configure(image=self._img)
+        self.DARK = not self.DARK
+        self.style.configure("Toolbutton", font=("Tahoma", 16))
+        self.style.configure("TButton", font=("Tahoma", 18))
+
+    def update_time(self):
+        self.time_spent += 1
+        self.timer.step(1)
+        if self.time_spent != 10:
+            return self.after(1000, self.update_time)
+
+        if not self.selected_option.get():
+            self.selected_option.set("None")
+        return self.check_mcq()
+
     def check_mcq(self):
-        print(self.correct, self.selected_option.get())
+        choosed = self.selected_option.get()
+        print(self.correct, choosed)
+        if not choosed:
+            return
+        self.submit.place_forget()
         is_correct = False
-        if self.correct == self.selected_option.get():
+        if self.correct == choosed:
             print("Correct answer")
             is_correct = True
+            self.current_score += 10
+            self.current_score_lbl.config(text=f"Score: {self.current_score}")
+            text = "correct"
         else:
             print("Incorrect answer")
-        self.update_options(self.selected_option.get(), is_correct)
+            text = "incorrect"
+        self.img = ImageTk.PhotoImage(
+            Image.open(f"./{text}.png").resize((50, 50)))
+        self.show_result = ttk.Label(self.quiz_area, text=text.capitalize(),
+                                     font=("Tahoma", 22), image=self.img, compound="left",
+                                     style=f"{'success' if is_correct else 'danger'}.TLabel")
+        self.show_result.place(x=530, y=450)
+        self.update_options(choosed, is_correct)
         print("updated")
         self.quiz_area.after(3000, self.update_quiz)
         print("Called")
@@ -139,6 +189,7 @@ class QuizApp(tk.Tk):
         self.submit.configure(state="disabled")
 
     def update_quiz(self):
+        self.show_result.destroy()
         try:
             no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
         except StopIteration:
@@ -146,10 +197,12 @@ class QuizApp(tk.Tk):
             self.question.destroy()
             self.options.destroy()
             self.submit.destroy()
-            self.total_score()
+            self.end_display()
             return
 
         print("worked")
+        self.submit.configure(state="active")
+        self.submit.place_configure(x=540, y=450)
         self.question.configure(text=f"Q{no}. {question}")
         width = len(max((op_a, op_b, op_c, op_d), key=len))+4
         self.selected_option.set("")
@@ -162,9 +215,8 @@ class QuizApp(tk.Tk):
         self.op_b.grid(padx=200-(width*2))
         self.op_d.grid(padx=200-(width*2))
         self.options.place_configure(x=370 if width < 15 else 350-(width*5))
-        self.submit.configure(state="active")
 
-    def total_score(self):
+    def end_display(self):
         end_label = ttk.Label(self.quiz_area, text="Quiz Ended !",
                               font=("Tahoma", 24, "bold"), style="info.TLabel")
         end_label.place(x=520, y=50)
@@ -176,7 +228,8 @@ class QuizApp(tk.Tk):
 
     def run(self):
         self._header()
-        self.quiz()
+        self.ask_to_start()
+        # self.start_quiz()
         self.mainloop()
 
 
