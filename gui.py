@@ -8,17 +8,17 @@ from database import QuizDB
 TODO:
 >>> Select a better day theme
 >>> Write doc of each method
->>> At starting, a button will display which ask start quiz, quit option. (CS quiz)                                                 DONE
+>>> At starting, a button will display which ask start quiz, quit option. (CS quiz)                                                         DONE
 
->>> After submitting, the button will forget and correct/incorrect with respective images will show                                 DONE
->>> Each mcq is of 10 point                                                                                                         DONE
->>> On top left, Current score label with ...->
->>> Meter on right of question shows time taken after 500 seconds and time left as it's label                                       DONE
->>> If time up, and not answered, it will marked as unattempted, and show unattempt
->>> New question came after 3 seconds (within 3 seconds correct/incorrect will display)                                             DONE
+>>> After submitting, the button will forget and correct/incorrect with respective images will show                                         DONE
+>>> Each mcq is of 10 point                                                                                                                 DONE
+On top left, Current score label with ...->
+>>> Meter on right of question shows time taken after 500 seconds and time left as it's label                                               DONE
+>>> If time up, and not answered, it will marked as unattempted, and show unattempt                                                         DONE
+>>> New question came after 3 seconds (within 3 seconds correct/incorrect will display)                                                     DONE
 
->>> When End, table will be shown, showing total score out of TOTAL points, total correct, total incorrect, unattempted out of TOTAL mcqs
->>> Also, asking for play again or quit option.
+>>> When End, table will be shown, showing total score out of TOTAL points, total correct, total incorrect, unattempted out of TOTAL mcqs   DONE
+>>> Also, asking for play again or quit option.                                                                                             DONE
 """
 
 
@@ -72,21 +72,17 @@ class QuizApp(tk.Tk):
         self.max_score = 60
         self.current_score = 0
         self.time_spent = 0
-        no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
-        # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
-        # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
-        # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
-        # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
-        # no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
+        self.correct, self.incorrect, self.unattempted = 0, 0, 0
+        no, question, op_a, op_b, op_c, op_d, self.correct_option = next(self.mcq)
 
-        print(no, question, op_a, op_b, op_c, op_d, self.correct)
+        print(no, question, op_a, op_b, op_c, op_d, self.correct_option)
         self.current_score_lbl = ttk.Label(self.quiz_area, text="Score:  0",
                                            font=("Arial", 18), style="primary.TLabel")
         self.current_score_lbl.place(x=50, y=20)
         self.timer = Meter(self.quiz_area, amounttotal=10, amountused=0,
                            metersize=150, textfont=("Arial", 40, "bold"), bootstyle="info.TMeter")
         self.timer.place(x=1000, y=20)
-        self.after(1000, self.update_time)
+        self.call_id = self.timer.after(1000, self.update_time)
         self.question = ttk.Label(self.quiz_area, text=f"Q{no}. {question}",
                                   font=("Arial", 22, "bold"), style="info.TLabel",
                                   wraplength=680, anchor="n", padding=(0, 8), width=45)
@@ -119,15 +115,40 @@ class QuizApp(tk.Tk):
         self.submit = ttk.Button(self.quiz_area, text="Submit", style="info.TButton",
                                  padding=(30, 5), command=self.check_mcq)
         self.submit.place(x=540, y=450)
-        # configure radio button
-        # meter on right of question showing time
-        # confirm button below
-        # when press confirm user will get popped when answer is true or false,
-        # and after 2 second, new question will load
 
         self.quiz_area.pack(side="top", fill="both", expand=1)
 
-        ...
+    def end_display(self):
+
+        end_frame = ttk.Frame(self, style="TFrame")
+        end_label = ttk.Label(end_frame, text="Quiz Ended !",
+                              font=("Tahoma", 28, "bold"), style="info.TLabel")
+        end_label.place(x=520, y=50)
+
+        total_score = ttk.Label(end_frame, text=f"Total Score: {self.current_score}",
+                                font=("Arial", 20), style="info.TLabel")
+        total_score.place(x=450, y=150)
+        correct = ttk.Label(end_frame, text=f"No. of Correct answers: {self.correct}",
+                            font=("Arial", 20), style="success.TLabel")
+        correct.place(x=450, y=200)
+        incorrect = ttk.Label(end_frame, text=f"No. of Incorrect answers: {self.incorrect}",
+                              font=("Arial", 20), style="danger.TLabel")
+        incorrect.place(x=450, y=250)
+        correct = ttk.Label(end_frame, text=f"Unattempted: {self.unattempted}",
+                            font=("Arial", 20), style="warning.TLabel")
+        correct.place(x=450, y=300)
+
+        play_again = ttk.Label(end_frame, text="Want to Play again ?", font=("Tahoma", 24),
+                               style="info.TLabel", justify="center", padding=(60, 5))
+        play_again.place(x=400, y=400)
+        start_btn = ttk.Button(end_frame, text="Yes", style="success.Outline.TButton", padding=(40, 5),
+                               command=lambda: end_frame.destroy() or self.start_quiz())
+        start_btn.place(x=450, y=500)
+        quit_btn = ttk.Button(end_frame, text="Quit", style="danger.Outline.TButton",
+                              padding=(40, 5), command=self.destroy)
+        quit_btn.place(x=650, y=500)
+
+        end_frame.pack(side="top", fill="both", expand=1)
 
     def change_theme(self):
         self.style.theme_use(themename="flatly" if self.DARK else "darkly")
@@ -140,9 +161,11 @@ class QuizApp(tk.Tk):
 
     def update_time(self):
         self.time_spent += 1
-        self.timer.step(1)
+        # self.timer.step(1)
+        self.timer.configure(amountused=self.time_spent)
         if self.time_spent != 10:
-            return self.after(1000, self.update_time)
+            self.call_id = self.timer.after(1000, self.update_time)
+            return
 
         if not self.selected_option.get():
             self.selected_option.set("None")
@@ -150,20 +173,30 @@ class QuizApp(tk.Tk):
 
     def check_mcq(self):
         choosed = self.selected_option.get()
-        print(self.correct, choosed)
+        print(self.correct_option, choosed)
         if not choosed:
             return
+        self.after_cancel(self.call_id)
+        self.timer.place_forget()
+        self.timer.configure(amountused=0)
         self.submit.place_forget()
         is_correct = False
-        if self.correct == choosed:
+        if self.correct_option == choosed:
             print("Correct answer")
             is_correct = True
+            self.correct += 1
             self.current_score += 10
             self.current_score_lbl.config(text=f"Score: {self.current_score}")
             text = "correct"
+        elif choosed == "None":
+            print("Unattempted")
+            self.unattempted += 1
+            text = "Unattempted"
         else:
             print("Incorrect answer")
+            self.incorrect += 1
             text = "incorrect"
+
         self.img = ImageTk.PhotoImage(
             Image.open(f"./{text}.png").resize((50, 50)))
         self.show_result = ttk.Label(self.quiz_area, text=text.capitalize(),
@@ -179,8 +212,9 @@ class QuizApp(tk.Tk):
         self.option_widgets = {i[1]["value"]: i[1]
                                for i in self.options.children.items()}
         new_style = "success.Outline.Toolbutton" if is_correct else "danger.Outline.Toolbutton"
-        self.option_widgets[choosed].configure(
-            style=new_style, state="selected")
+        if choosed != "None":
+            self.option_widgets[choosed].configure(
+                style=new_style, state="selected")
 
         for option, widget in self.option_widgets.items():
             if option == choosed:
@@ -191,17 +225,20 @@ class QuizApp(tk.Tk):
     def update_quiz(self):
         self.show_result.destroy()
         try:
-            no, question, op_a, op_b, op_c, op_d, self.correct = next(self.mcq)
+            no, question, op_a, op_b, op_c, op_d, self.correct_option = next(
+                self.mcq)
         except StopIteration:
             print("END OF QUESTIONS")
             self.question.destroy()
             self.options.destroy()
             self.submit.destroy()
+            self.current_score_lbl.destroy()
+            self.quiz_area.pack_forget()
             self.end_display()
             return
 
         print("worked")
-        self.submit.configure(state="active")
+        self.submit.configure(state="normal")
         self.submit.place_configure(x=540, y=450)
         self.question.configure(text=f"Q{no}. {question}")
         width = len(max((op_a, op_b, op_c, op_d), key=len))+4
@@ -214,12 +251,11 @@ class QuizApp(tk.Tk):
         self.op_d.configure(text=f"d. {op_d}", **new_values)
         self.op_b.grid(padx=200-(width*2))
         self.op_d.grid(padx=200-(width*2))
+        self.timer.place(x=1000, y=20)
+        self.timer.configure(amountused=0)
+        self.time_spent = 0
+        self.call_id = self.timer.after(1000, self.update_time)
         self.options.place_configure(x=370 if width < 15 else 350-(width*5))
-
-    def end_display(self):
-        end_label = ttk.Label(self.quiz_area, text="Quiz Ended !",
-                              font=("Tahoma", 24, "bold"), style="info.TLabel")
-        end_label.place(x=520, y=50)
 
     @staticmethod
     def get_mcqs():
