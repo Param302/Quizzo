@@ -31,10 +31,8 @@ class QuizDB:
 
     def insert_mcq(self, question, op_a, op_b, op_c, op_d, correct):
         __query = """INSERT INTO MCQ VALUES (default, %s, %s, %s, %s, %s, %s);"""
-        self._cursor.execute(
-            __query,
-            (question, op_a, op_b, op_c, op_d, correct)
-        )
+        self._cursor.execute(__query,
+                             (question, op_a, op_b, op_c, op_d, correct))
         self._con.commit()
 
     def delete_mcq(self, q_no):
