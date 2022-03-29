@@ -9,6 +9,7 @@ from database import QuizDB
 class QuizApp(tk.Tk):
     DARK = True
     path = os.getcwd() + "/"
+    path += "quizzo/" if "quizzo" not in os.getcwd() else ""
 
     def __init__(self):
         super().__init__()
