@@ -1,4 +1,5 @@
 from gui import QuizApp
 
-app = QuizApp()
-app.run()
+if __name__ == "__main__":
+    app = QuizApp()
+    app.run()
