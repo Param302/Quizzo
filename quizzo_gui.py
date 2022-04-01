@@ -135,8 +135,8 @@ class QuizApp(tk.Tk):
         Also, ask user to play again or quit."""
 
         end_frame = ttk.Frame(self, style="TFrame")
-        end_label = ttk.Label(end_frame, text="Quiz Ended !",
-                              font=("Tahoma", 28, "bold"), style="info.TLabel")
+        end_label = ttk.Label(end_frame, text="Quiz Summary",
+                              font=("Tahoma", 28, "bold", "underline"), style="info.TLabel")
         end_label.place(x=500, y=20)
 
         total_score = ttk.Label(end_frame, font=("Arial", 20), style="success.TLabel",
