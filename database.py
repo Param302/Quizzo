@@ -57,6 +57,7 @@ class QuizDB:
 
 if __name__ == "__main__":
     mydb = QuizDB()
+    """QUERIES TO ADD SOME MCQs"""
     # mydb.insert_mcq(
     #     "What is the full form of WWW ?",
     #     "World Wide Ware", "World Wide Website",
@@ -86,6 +87,4 @@ if __name__ == "__main__":
     #     "modulation", "demodualation", "conversion", "transformation",
     #     correct="a"
     # )
-    print(mydb.get_mcq(1))
-    print(mydb.get_all_mcq())
     mydb.close()
