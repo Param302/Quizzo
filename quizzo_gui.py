@@ -8,14 +8,15 @@ from database import QuizDB
 
 class QuizApp(tk.Tk):
     DARK = True
-    path = os.getcwd() + "/"
+    image_path = os.getcwd() + "/"
     # folder name added in path, for $ python quizzo
-    path += "quizzo/" if "quizzo" not in os.getcwd() else ""
-    path += "assets/"
+    image_path += "quizzo/" if "quizzo" not in os.getcwd() else ""
+    image_path += "assets"
 
     def __init__(self):
         super().__init__()
         self.title("Quizzo")
+        self.iconbitmap(f"{self.image_path}/icon.ico")
         self.geometry("1200x700+350+150")
         self.resizable(False, False)
         self.style = Style(theme="darkly")
@@ -32,7 +33,7 @@ class QuizApp(tk.Tk):
                                   justify="center", style="warning.TLabel", padding=(550, 10, 460, 10))
         self.app_name.grid(sticky="nw", row=0, column=0)
         self._img = ImageTk.PhotoImage(
-            Image.open(f"{self.path}sun.png").resize((30, 30)))
+            Image.open(f"{self.image_path}/sun.png").resize((30, 30)))
         self.theme_mode = ttk.Button(
             self.header, image=self._img, style="warning.Outline.TButton", command=self._change_theme)
         self.theme_mode.grid(row=0, column=1)
@@ -60,12 +61,12 @@ class QuizApp(tk.Tk):
                               padding=(40, 5), command=self.destroy)
         quit_btn.place(x=650, y=300)
         self.add_img = ImageTk.PhotoImage(
-            Image.open(f"{self.path}add.png").resize((30, 30)))
+            Image.open(f"{self.image_path}/add.png").resize((30, 30)))
         add_btn = ttk.Button(frame_1, text="  Add question", image=self.add_img, compound="left",
                              style="success.Outline.TButton", padding=(30, 5), command=self._add_mcq)
         add_btn.place(x=500, y=400)
         self.del_img = ImageTk.PhotoImage(
-            Image.open(f"{self.path}delete.png").resize((30, 30)))
+            Image.open(f"{self.image_path}/delete.png").resize((30, 30)))
         del_btn = ttk.Button(frame_1, text=" Delete question", image=self.del_img, compound="left",
                              style="danger.Outline.TButton", padding=(20, 5), command=self._delete_mcq)
         del_btn.place(x=500, y=480)
@@ -258,7 +259,7 @@ class QuizApp(tk.Tk):
         """Change night mode to day mode and vice-versa."""
         self.style.theme_use(themename="flatly" if self.DARK else "darkly")
         self._img = ImageTk.PhotoImage(Image.open(
-            self.path + ("moon.png" if self.DARK else "sun.png")).resize((30, 30)))
+            self.image_path + ("moon.png" if self.DARK else "sun.png")).resize((30, 30)))
         self.theme_mode.configure(image=self._img)
         self.DARK = not self.DARK
 
@@ -308,7 +309,7 @@ class QuizApp(tk.Tk):
             text = "incorrect"
 
         self.img = ImageTk.PhotoImage(      # shows appropriate image with text
-            Image.open(f"{self.path}{text}.png").resize((50, 50)))
+            Image.open(f"{self.image_path}/{text}.png").resize((50, 50)))
         self.show_result = ttk.Label(self.quiz_area, text=text.capitalize(),
                                      font=("Tahoma", 22), image=self.img, compound="left",
                                      style=f"{'success' if is_correct else 'danger'}.TLabel")
