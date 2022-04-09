@@ -4,7 +4,7 @@ import mysql.connector as connector
 class QuizDB:
     def __init__(self):
 
-        self._con = connector.connect(user="root", password="Ishu2004*",
+        self._con = connector.connect(user="root", password="password",
                                       host="localhost", port="3306", database="QUIZDB"
                                       )
 
