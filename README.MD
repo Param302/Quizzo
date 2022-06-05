@@ -31,9 +31,14 @@ $ pip install -r requirements.txt
 ```
 - To start, run `__main__.py` file or:
 ```bash
-$ python quizzo
+$ python Quizzo
 ```
-**quizzo** is the repo name
+**Quizzo** is the repo name
+- Change [line no.19](https://github.com/Param302/Quizzo/blob/main/quizzo_gui.py#L19) of adding icon
+```self.iconbitmap(f"{self.image_path}/icon.ico")```
+to below line, if you are using this on Linux/Mac.
+```self.icon = ImageTk.PhotoImage(Image.open(f"{self.image_path}/icon.ico")
+self.tk.call("wm", "iconphoto", self._w, self.icon)```
 
 ## Screenshots
 ![main screen](./previews/main%201.jpg)
