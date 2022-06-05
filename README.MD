@@ -37,7 +37,8 @@ $ python Quizzo
 - Change [line no.19](https://github.com/Param302/Quizzo/blob/main/quizzo_gui.py#L19) of adding icon
 ```self.iconbitmap(f"{self.image_path}/icon.ico")```
 to below line, if you are using this on Linux/Mac.
-```self.icon = ImageTk.PhotoImage(Image.open(f"{self.image_path}/icon.ico")
+```
+self.icon = ImageTk.PhotoImage(Image.open(f"{self.image_path}/icon.ico")
 self.tk.call("wm", "iconphoto", self._w, self.icon)```
 
 ## Screenshots
