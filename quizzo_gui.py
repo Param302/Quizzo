@@ -10,13 +10,14 @@ class QuizApp(tk.Tk):
     DARK = True
     image_path = os.getcwd() + "/"
     # folder name added in path, for $ python quizzo
-    image_path += "quizzo/" if "quizzo" not in os.getcwd() else ""
-    image_path += "assets"
+    image_path += "Quizzo/" if "Quizzo" not in os.getcwd() else ""
+    image_path += "assets/"
 
     def __init__(self):
         super().__init__()
         self.title("Quizzo")
-        self.iconbitmap(f"{self.image_path}/icon.ico")
+        self.icon = ImageTk.PhotoImage(Image.open(f"{self.image_path}/icon.ico"))
+        self.tk.call("wm", "iconphoto", self._w, self.icon)
         self.geometry("1200x700+350+150")
         self.resizable(False, False)
         self.style = Style(theme="darkly")

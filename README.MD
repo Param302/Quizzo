@@ -22,8 +22,8 @@ A GUI quiz application made in Tkinter (school project).
 - ttkbootstrap (1.6.0)
 
 ## Setup before run
-- Create a mysql database named `"Quizzo"`
-```mysql> CREATE DATABASE Quizzo;```
+- Create a mysql database named `"QUIZDB"`
+```mysql> CREATE DATABASE QUIZDB;```
 
 - To install required modules run following command in terminal in project folder.
 ```bash
@@ -34,12 +34,10 @@ $ pip install -r requirements.txt
 $ python Quizzo
 ```
 **Quizzo** is the repo name
-- Change [line no.19](https://github.com/Param302/Quizzo/blob/main/quizzo_gui.py#L19) of adding icon
-```self.iconbitmap(f"{self.image_path}/icon.ico")```
-to below line, if you are using this on Linux/Mac.
+- Run [database.py](./database.py) to add some example mcqs in the database. And comment line no. 91 after running it.
+- Comment below line.
 ```
-self.icon = ImageTk.PhotoImage(Image.open(f"{self.image_path}/icon.ico")
-self.tk.call("wm", "iconphoto", self._w, self.icon)
+    mydb.add_example_mcqs()
 ```
 
 ## Screenshots
