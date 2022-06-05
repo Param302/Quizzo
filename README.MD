@@ -22,6 +22,9 @@ A GUI quiz application made in Tkinter (school project).
 - ttkbootstrap (1.6.0)
 
 ## Setup before run
+- Create a mysql database named `"Quizzo"`
+```mysql> CREATE DATABASE Quizzo;```
+
 - To install required modules run following command in terminal in project folder.
 ```bash
 $ pip install -r requirements.txt
