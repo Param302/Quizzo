@@ -39,7 +39,8 @@ $ python Quizzo
 to below line, if you are using this on Linux/Mac.
 ```
 self.icon = ImageTk.PhotoImage(Image.open(f"{self.image_path}/icon.ico")
-self.tk.call("wm", "iconphoto", self._w, self.icon)```
+self.tk.call("wm", "iconphoto", self._w, self.icon)
+```
 
 ## Screenshots
 ![main screen](./previews/main%201.jpg)
